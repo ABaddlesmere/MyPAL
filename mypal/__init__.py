@@ -1,1 +1,1 @@
-from client.client import Client
+from mypal.client.client import Client
