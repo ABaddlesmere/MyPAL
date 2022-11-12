@@ -4,6 +4,7 @@ from mypal.client.http_enums import HTTP_ENUMS
 from mypal.models.mypal.enums import AnimeRankingType, AnimeSortType, SeasonType
 from mypal.models.mypal.fields import AnimeField, MangaField
 from mypal.utils.param_handlers import steralise, to_str
+from mypal.models.mypal.pagination import Pagination
 
 class Client:
     def __init__(self, clientID: str, **kwargs) -> None:
@@ -27,7 +28,7 @@ class Client:
         limit: int = None,
         nsfw: bool = None,
         offset: int = None
-        ):
+        ) -> Pagination:
         
         params: str = steralise(
             locals(),
@@ -36,20 +37,14 @@ class Client:
         params["q"] = params["query"]
         params.pop("query")
         json = await self.router.GET(url=HTTP_ENUMS.A_SEARCH, params=to_str(params))
-        print(json)
-        l = []
-        print(params['fields'])
-        for node in json['data']:
-            print(node['node'])
-            l.append(Anime(node['node'], params['fields']))
-        json['nodes'] = l
-        return json
+        pages = Pagination(json, Anime, params['fields'])
+        return pages
 
 
     async def get_anime_details(
         self,
         id: int,
-        fields: list[AnimeField]|AnimeField = AnimeField.DEFAULT,
+        fields: list[AnimeField]|AnimeField = None,
         nsfw: bool = None,
         ):
         ...
