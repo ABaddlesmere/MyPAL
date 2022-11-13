@@ -9,7 +9,8 @@ from mypal.models.mypal.pagination import Pagination
 class Client:
     def __init__(self, clientID: str, **kwargs) -> None:
         self.__clientID = clientID
-        self.router = Router(clientID = clientID)
+        if not kwargs.get("debugDisableRouterOnStartup", False):
+            self.router = Router(clientID = clientID)
         self.defaults = {
             "nsfw": kwargs.get("default_nsfw", False),
             "limit": kwargs.get("default_limit", 20),
@@ -30,15 +31,15 @@ class Client:
         offset: int = None
         ) -> Pagination:
         
-        params: str = steralise(
-            locals(),
-            self.anime_defaults
-        )
+        params: dict = steralise(locals(), self.anime_defaults)
         params["q"] = params["query"]
         params.pop("query")
-        json = await self.router.GET(url=HTTP_ENUMS.A_SEARCH, params=to_str(params))
-        pages = Pagination(json, Anime, params['fields'])
-        return pages
+
+        router_payload = await self.router.GET(
+            url=HTTP_ENUMS.A_SEARCH,
+            params=to_str(params)
+        )
+        return Pagination(router_payload, Anime, params['fields'])
 
 
     async def get_anime_details(
@@ -46,27 +47,50 @@ class Client:
         id: int,
         fields: list[AnimeField]|AnimeField = None,
         nsfw: bool = None,
-        ):
-        ...
+        ) -> Anime:
+        
+        params: dict = steralise(locals(), self.anime_defaults)
+
+        router_payload = await self.router.GET(
+            url=HTTP_ENUMS.A_GET_DETAILS.replace("/id", f"/{id}"),
+            params=to_str(params)
+        )
+        
+        return Anime(router_payload, params['fields'])
     
     async def get_anime_season(
         self,
         season: SeasonType,
         year: int,
-        fields: list[AnimeField]|AnimeField = AnimeField.DEFAULT,
+        fields: list[AnimeField]|AnimeField = None,
         nsfw: bool = None,
         sort: AnimeSortType = None,
-        limit: int = 20,
-        offset: int = 0,
-        ):
-        ...
+        limit: int = None,
+        offset: int = None,
+        ) -> Pagination:
+        print(locals())
+        params: dict = steralise(locals(), self.anime_defaults, excludes=["season","year"])
+        router_payload = await self.router.GET(
+            url=HTTP_ENUMS.A_SEASONAL.replace("/y", f"/{year}").replace("/m", f"/{season}"),
+            params=to_str(params)
+        )
+
+        return Pagination(router_payload, Anime, params['fields'])
+
 
     async def get_anime_ranking(
         self,
         ranking: AnimeRankingType,
-        fields: list[AnimeField]|AnimeField = AnimeField.DEFAULT,
+        fields: list[AnimeField]|AnimeField = None,
         nsfw: bool = None,
-        limit: int = 20,
-        offset: int = 0
-        ):
-        ...
+        limit: int = None,
+        offset: int = None
+        ) -> Pagination:
+        
+        params: dict = steralise(locals(), self.anime_defaults)
+        router_payload = await self.router.GET(
+            url=HTTP_ENUMS.A_RANKING,
+            params=to_str(params)
+        )
+        
+        return Pagination(router_payload, Anime, params['fields'])
