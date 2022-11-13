@@ -1,8 +1,9 @@
-def steralise(params: dict, defaults: dict) -> str:
-    if "self" in params:
-        params.pop("self")
+def steralise(params: dict, defaults: dict, excludes: list[str] = []) -> str:
+    excludes.append("self")
     new = {}
     for key, value in params.items():
+        if key in excludes:
+            continue
         new[key] = defaults[key] if value is None else value
     return new
 
