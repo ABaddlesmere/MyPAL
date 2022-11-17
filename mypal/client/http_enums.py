@@ -4,4 +4,4 @@ class HTTP_ENUMS:
     A_SEARCH: str = f"{__BASE}/anime"
     A_GET_DETAILS: str = f"{__BASE}/anime/id"
     A_RANKING: str = f"{__BASE}/anime/ranking"
-    A_SEASONAL: str = f"{__BASE}/anime/seasonal/y/m"
+    A_SEASONAL: str = f"{__BASE}/anime/season/y/m"
