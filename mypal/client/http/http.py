@@ -24,6 +24,14 @@ class Router:
     
 
     async def GET(self, url, params):
+        if self.locked:
+            if self.limiter.unlockCheck():
+                self.locked = False
+            else:
+                return
+        if self.limiter.lockCheck():
+            self.locked = True
+            return
         
         async with aiohttp.ClientSession(headers=self.header) as session:
             async with session.get(url=f"{url}?{params}") as resp:
