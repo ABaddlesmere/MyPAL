@@ -1,6 +1,6 @@
 import asyncio
 import aiohttp
-
+from limiter import Limiter
 class RateLimitError:
     ...
 class ManualLockError:
@@ -8,19 +8,13 @@ class ManualLockError:
 
 class Router:
     def __init__(self, *args, **kwargs) -> None:
-        self.rps = kwargs.get("reqpsec", 5)
+        self.limiter = Limiter(kwargs.get("reqpsec", 5))
         self.requests_ps_locker = kwargs.get("reqpseclocker", self.rps+5)
         self.requests = []
         self.locked = False
         self.header = {"X-MAL-CLIENT-ID": kwargs.get("clientID", None)}
 
         self.clientSession = None
-
-
-    async def lock(self, time):
-        self.locked = True
-        asyncio.sleep(time)
-        self.locked = False
 
     async def refresh_clientSession(self):
         print(f"Making a new session as the last one was closed: {self.clientSession.closed if self.clientSession is not None else 'clientSession is None'}")
@@ -30,7 +24,7 @@ class Router:
     
 
     async def GET(self, url, params):
-
+        
         async with aiohttp.ClientSession(headers=self.header) as session:
             async with session.get(url=f"{url}?{params}") as resp:
                 # resp = r
