@@ -14,10 +14,10 @@ setup(
     url="https://github.com/ABaddlesmere/MyPAL",
     install_requires=['aiohttp', 'asyncio'],
     packages=find_packages(),
-    python_requires=">=3.9",
+    python_requires=">=3.10",
     include_package_data=True,
     classifiers=[
-        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
