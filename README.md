@@ -34,6 +34,8 @@ client = Client(CLIENT_ID)
 async def main():
         anime = await client.get_anime_details(id=1)
         print(anime.title)
-
+        
+loop = asyncio.new_event_loop()
+asyncio.set_event_loop(loop)
 loop.run_until_complete(main())
 ```
