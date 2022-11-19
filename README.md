@@ -34,8 +34,19 @@ client = Client(CLIENT_ID)
 async def main():
         anime = await client.get_anime_details(id=1)
         print(anime.title)
-        
+
 loop = asyncio.new_event_loop()
 asyncio.set_event_loop(loop)
 loop.run_until_complete(main())
 ```
+
+## Roadmap
+This is the roadmap for features leading up to the 1.0 release
+### Methods
+- [ ] Manga Search
+- [ ] Get manga details
+- [ ] Get manga ranking
+### Refactor
+- [ ] Make the use of enums consistent throught
+### Other
+- [x] Add rate limiter (being worked on, see [rate-limiter branch](https://github.com/ABaddlesmere/MyPAL/tree/rate-limit))
