@@ -1,1 +1,5 @@
-from mypal.client.client import Client
+'''
+Base MyPAL
+'''
+from .client.client import Client
+from .models.mypal import enums, fields
