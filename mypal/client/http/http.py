@@ -7,6 +7,7 @@ class Router:
         self.__limiter: Limiter = Limiter(kwargs.get("reqpsec", 5))
         self.__locked = False
         self.__header = {"X-MAL-CLIENT-ID": kwargs.get("clientID", None)}
+        self.__lock_reason = "Unlocked"
 
     '''
     TODO: Figure out an elegant way to reuse and refresh ClientSession
@@ -23,17 +24,34 @@ class Router:
     '''
     
     @property
-    def locked(self):
-        return self.__locked
+    def lock_status(self):
+        return {"locked":self.__locked, "reason":self.__lock_reason}
+
+    def __lock(self, reason: str):
+        self.__locked = True
+        self.__lock_reason = reason
+    
+    def __unlock(self):
+        self.__locked = False
+        self.__lock_reason = "Unlocked"
+
+    def test_rateLimit(self):
+        if self.__locked and self.__limiter.unlimitCheck():
+            self.__unlock()
+        else:
+            pass
+        if self.__limiter.lockCheck():
+            self.__lock("Limiter Action")
+            pass
+        print(self.lock_status)
 
     async def GET(self, url, params):
-        if self.__locked:
-            if self.__limiter.unlockCheck():
-                self.__locked = False
-            else:
-                return
+        if self.__locked and self.__limiter.unlimitCheck():
+            self.__unlock()
+        else:
+            return
         if self.__limiter.lockCheck():
-            self.__locked = True
+            self.__lock("Limiter Action")
             return
         json = {"httpError":"", "httpExtra":"N/A"}
         async with aiohttp.ClientSession(headers=self.__header) as session:
@@ -55,12 +73,15 @@ class Router:
                         ##Forbidden, i.e. DoS or being ratelimited
                         print(f"[ERROR] MAL has denied access for this endpoint. This could be due to DoS or rate limiting | {resp.status} ; {resp.method} ; {resp.reason} ; {resp.url}")
                         json["httpError"] = "Recieved 403"
+                        self.__limiter.timeout()
                         if self.__limiter.checkFrom403():
                             print(f"[ERROR] The denied access is thought to be rate limiting")
                             json["httpExtra"] = "Assuming rate limiting"
+                            self.__lock("403 Action - Assuming Rate Limiting")
                         else:
                             print(f"[ERROR] The denied access is thought NOT to be rate limiting")
                             json["httpExtra"] = "Assuming DoS"
+                            self.__lock("403 Action - Assuming DoS")
                     case 404:
                         ##Not found, the thing you search for was not found
                         print(f"[ERROR] MAL did not find anything for this endpoint | {resp.status} ; {resp.method} ; {resp.reason} ; {resp.url}")

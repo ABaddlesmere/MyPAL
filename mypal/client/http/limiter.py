@@ -8,6 +8,9 @@ class Limiter:
         self.__history = []
 
     def lockCheck(self):
+        if self.__timeout:
+            if not self.unlimitCheck():
+                return True
         current_time = time.time()
         print(f"self.__history is {self.__history}")
         if len(self.__history) < self.__max:
@@ -24,7 +27,14 @@ class Limiter:
                 print(f"history reset | passed")
                 return False
 
-    def unlockCheck(self):
+    def timeout(self):
+        '''
+        Timesout the limiter for 60 seconds
+        '''
+        self.__history.append(time.time())
+        self.__timeout = True
+
+    def unlimitCheck(self):
         if (time.time()-max(self.__history)) >= 60:
             self.__history = []
             return True
