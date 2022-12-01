@@ -11,17 +11,17 @@ class Client:
     def __init__(self, clientID: str, **kwargs) -> None:
         self.__clientID = clientID
         if not kwargs.get("debugDisableRouterOnStartup", False):
-            self.router = Router(clientID = clientID)
-        self.defaults = {
+            self.__router = Router(clientID = clientID)
+        self.__defaults = {
             "nsfw": kwargs.get("default_nsfw", False),
             "limit": kwargs.get("default_limit", 20),
             "offset": kwargs.get("default_offset", 0),
 
         }
-        self.anime_defaults = self.defaults.copy()
-        self.anime_defaults["fields"] = kwargs.get("default_anime_fields", AnimeField.DEFAULT)
-        self.manga_defaults = self.defaults.copy()
-        self.manga_defaults["fields"] = kwargs.get("default_manga_fields", MangaField.DEFAULT)
+        self.__anime_defaults = self.__defaults.copy()
+        self.__anime_defaults["fields"] = kwargs.get("default_anime_fields", AnimeField.DEFAULT)
+        self.__manga_defaults = self.__defaults.copy()
+        self.__manga_defaults["fields"] = kwargs.get("default_manga_fields", MangaField.DEFAULT)
 
     async def search_anime(
         self,
@@ -32,11 +32,11 @@ class Client:
         offset: int = None
         ) -> Pagination:
         
-        params: dict = steralise(locals(), self.anime_defaults)
+        params: dict = steralise(locals(), self.__anime_defaults)
         params["q"] = params["query"]
         params.pop("query")
 
-        router_payload = await self.router.GET(
+        router_payload = await self.__router.GET(
             url=HTTP_ENUMS.A_SEARCH,
             params=to_str(params)
         )
@@ -50,9 +50,9 @@ class Client:
         nsfw: bool = None,
         ) -> Anime:
         
-        params: dict = steralise(locals(), self.anime_defaults)
+        params: dict = steralise(locals(), self.__anime_defaults)
 
-        router_payload = await self.router.GET(
+        router_payload = await self.__router.GET(
             url=HTTP_ENUMS.A_GET_DETAILS.replace("/id", f"/{id}"),
             params=to_str(params)
         )
@@ -70,8 +70,8 @@ class Client:
         offset: int = None,
         ) -> Pagination:
         print(locals())
-        params: dict = steralise(locals(), self.anime_defaults, excludes=["season","year"])
-        router_payload = await self.router.GET(
+        params: dict = steralise(locals(), self.__anime_defaults, excludes=["season","year"])
+        router_payload = await self.__router.GET(
             url=HTTP_ENUMS.A_SEASONAL.replace("/y", f"/{year}").replace("/m", f"/{season}"),
             params=to_str(params)
         )
@@ -88,8 +88,8 @@ class Client:
         offset: int = None
         ) -> Pagination:
         
-        params: dict = steralise(locals(), self.anime_defaults)
-        router_payload = await self.router.GET(
+        params: dict = steralise(locals(), self.__anime_defaults)
+        router_payload = await self.__router.GET(
             url=HTTP_ENUMS.A_RANKING,
             params=to_str(params)
         )
@@ -105,11 +105,11 @@ class Client:
         offset: int = None
         ) -> Pagination:
         
-        params: dict = steralise(locals(), self.manga_defaults)
+        params: dict = steralise(locals(), self.__manga_defaults)
         params["q"] = params["query"]
         params.pop("query")
 
-        router_payload = await self.router.GET(
+        router_payload = await self.__router.GET(
             url=HTTP_ENUMS.M_SEARCH,
             params=to_str(params)
         )
@@ -123,9 +123,9 @@ class Client:
         nsfw: bool = None,
         ) -> Anime:
         
-        params: dict = steralise(locals(), self.manga_defaults)
+        params: dict = steralise(locals(), self.__manga_defaults)
 
-        router_payload = await self.router.GET(
+        router_payload = await self.__router.GET(
             url=HTTP_ENUMS.M_GET_DETAILS.replace("/id", f"/{id}"),
             params=to_str(params)
         )
@@ -141,8 +141,8 @@ class Client:
         offset: int = None
         ) -> Pagination:
         
-        params: dict = steralise(locals(), self.manga_defaults)
-        router_payload = await self.router.GET(
+        params: dict = steralise(locals(), self.__manga_defaults)
+        router_payload = await self.__router.GET(
             url=HTTP_ENUMS.M_RANKING,
             params=to_str(params)
         )
