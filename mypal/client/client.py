@@ -1,7 +1,8 @@
 from mypal.models.mal.anime import Anime
-from mypal.client.http import Router
-from mypal.client.http_enums import HTTP_ENUMS
-from mypal.models.mypal.enums import AnimeRankingType, AnimeSortType, SeasonType
+from mypal.client.http.http import Router
+from mypal.client.http.http_enums import HTTP_ENUMS
+from mypal.models.mal.manga import Manga
+from mypal.models.mypal.enums import AnimeRankingType, AnimeSortType, MangaRankingType, SeasonType
 from mypal.models.mypal.fields import AnimeField, MangaField
 from mypal.utils.param_handlers import steralise, to_str
 from mypal.models.mypal.pagination import Pagination
@@ -94,3 +95,56 @@ class Client:
         )
         
         return Pagination(router_payload, Anime, params['fields'])
+
+    async def search_manga(
+        self,
+        query: str,
+        fields: list[MangaField]|MangaField = None,
+        limit: int = None,
+        nsfw: bool = None,
+        offset: int = None
+        ) -> Pagination:
+        
+        params: dict = steralise(locals(), self.manga_defaults)
+        params["q"] = params["query"]
+        params.pop("query")
+
+        router_payload = await self.router.GET(
+            url=HTTP_ENUMS.M_SEARCH,
+            params=to_str(params)
+        )
+        return Pagination(router_payload, Manga, params['fields'])
+
+
+    async def get_manga_details(
+        self,
+        id: int,
+        fields: list[MangaField]|MangaField = None,
+        nsfw: bool = None,
+        ) -> Anime:
+        
+        params: dict = steralise(locals(), self.manga_defaults)
+
+        router_payload = await self.router.GET(
+            url=HTTP_ENUMS.M_GET_DETAILS.replace("/id", f"/{id}"),
+            params=to_str(params)
+        )
+        
+        return Manga(router_payload, params['fields'])
+
+    async def get_manga_ranking(
+        self,
+        ranking: MangaRankingType,
+        fields: list[MangaField]|MangaField = None,
+        nsfw: bool = None,
+        limit: int = None,
+        offset: int = None
+        ) -> Pagination:
+        
+        params: dict = steralise(locals(), self.manga_defaults)
+        router_payload = await self.router.GET(
+            url=HTTP_ENUMS.M_RANKING,
+            params=to_str(params)
+        )
+        
+        return Pagination(router_payload, Manga, params['fields'])
