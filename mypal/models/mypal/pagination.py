@@ -9,16 +9,18 @@ class Pagination:
         self.previous: str = data['paging'].get("previous", None)
         self.__nodes: list[Media] = []
 
-        #Paginate nodes
-        for node in data['data']:
-            self.nodes.append(NodeType(node['node'], fields))
+        if data['data'] != []:
+            for node in data['data']:
+                self.nodes.append(NodeType(node['node'], fields))
+        else:
+            print(f"[WARN] No media was returned in this pagination")
 
     @property
     def node(self):
         '''
         Returns the first node in the pagination as its node type
         '''
-        return self.__nodes[0]
+        return self.__nodes[0] if len(self.__nodes) >= 1 else []
     
     @property
     def nodes(self):
