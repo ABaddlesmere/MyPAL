@@ -1,4 +1,4 @@
-## Note: This project is in early alpha
+## Note: This project is in alpha
 
 **Breaking changes can be made to `main` at any point.**
 
@@ -10,7 +10,7 @@ Welcome to MyPAL, a third party asynchronous python API wrapper for MyAnimeList.
 
 ## Features
 
-MyPAL is in early alpha. This means so features from the API may be missing, but that doesn't mean they won't be implemented! There is a [Roadmap](https://github.com/ABaddlesmere/MyPAL#roadmap) available to view what features will be implemented on the journey up to release 1.0
+MyPAL is in alpha. This means so features from the API may be missing, but that doesn't mean they won't be implemented! There is a [Roadmap](https://github.com/ABaddlesmere/MyPAL#roadmap) available to view what features will be implemented on the journey up to release 1.0
 
 ## How do I use MyPAL?
 
@@ -42,11 +42,16 @@ loop.run_until_complete(main())
 
 ## Roadmap
 This is the roadmap for features leading up to the 1.0 release
-### Methods
-- [ ] Manga Search
-- [ ] Get manga details
-- [ ] Get manga ranking
-### Refactor
-- [ ] Make the use of enums consistent throught
-### Other
-- [x] Add rate limiter (being worked on, see [rate-limiter branch](https://github.com/ABaddlesmere/MyPAL/tree/rate-limit))
+### Planned
+- [ ] client.http rewrite
+- [ ] Replace errors, warnings and debug prints with logging
+- [ ] Add basic documentation for models and client
+### In Progress
+- [ ] Add unit tests
+- [x] Implement smart caching
+### Completed
+- [x] Manga Search
+- [x] Get manga details
+- [x] Get manga ranking
+- [x] Make the use of enums consistent throught
+- [x] Add rate limiter
