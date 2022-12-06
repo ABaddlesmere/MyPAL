@@ -6,6 +6,7 @@ class Limiter:
     def __init__(self, limit: int = 10) -> None:
         self.__max = limit
         self.__history = []
+        self.__timeout = False
 
     def lockCheck(self):
         if self.__timeout:

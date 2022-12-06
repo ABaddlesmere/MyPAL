@@ -24,7 +24,7 @@ class Router:
     #     self.clientSession = aiohttp.ClientSession(headers=self.__header)
     #     await asyncio.sleep(0.1)
     '''
-    
+
     @property
     def lock_status(self):
         return {"locked":self.__locked, "reason":self.__lock_reason}
@@ -48,10 +48,11 @@ class Router:
         print(self.lock_status)
 
     async def GET(self, url, params):
-        if self.__locked and self.__limiter.unlimitCheck():
-            self.__unlock()
-        else:
-            return
+        if self.__locked:
+            if self.__limiter.unlimitCheck():
+                self.__unlock()
+            else:
+                return
         if self.__limiter.lockCheck():
             self.__lock("Limiter Action")
             return
