@@ -50,7 +50,7 @@ class Client:
         nsfw: bool = None,
         ) -> Anime:
         
-        params: dict = steralise(locals(), self.__anime_defaults)
+        params: dict = steralise(locals(), self.__anime_defaults, excludes=["id"])
 
         router_payload = await self.__router.GET(
             url=HTTP_ENUMS.A_GET_DETAILS.replace("/id", f"/{id}"),
@@ -123,7 +123,7 @@ class Client:
         nsfw: bool = None,
         ) -> Anime:
         
-        params: dict = steralise(locals(), self.__manga_defaults)
+        params: dict = steralise(locals(), self.__manga_defaults, excludes=["id"])
 
         router_payload = await self.__router.GET(
             url=HTTP_ENUMS.M_GET_DETAILS.replace("/id", f"/{id}"),
