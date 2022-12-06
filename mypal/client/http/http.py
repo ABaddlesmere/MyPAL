@@ -1,5 +1,7 @@
 import aiohttp
-from limiter import Limiter
+
+from mypal.client.http.limiter import Limiter
+
 
 
 class Router:
